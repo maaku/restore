@@ -21,7 +21,6 @@ binary-0.8.6.0
 - Add binary instance for Data.Functor.Identity from base, #146.
 - Don't use * when we have TypeOperators, #148.
 
-
 binary-0.8.5.0
 --------------
 
