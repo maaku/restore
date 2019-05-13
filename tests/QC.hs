@@ -40,15 +40,15 @@ import           Test.QuickCheck hiding (total)
 
 import qualified Action                               (tests)
 import           Arbitrary                            ()
-import           Data.Binary
-import           Data.Binary.Get
-import           Data.Binary.Put
-import qualified Data.Binary.Class as Class
+import           Data.Restore
+import           Data.Restore.Get
+import           Data.Restore.Put
+import qualified Data.Restore.Class as Class
 
 
 ------------------------------------------------------------------------
 
-roundTrip :: (Eq a, Binary a) => a -> (L.ByteString -> L.ByteString) -> Bool
+roundTrip :: (Eq a, Restore a) => a -> (L.ByteString -> L.ByteString) -> Bool
 roundTrip a f = a ==
     {-# SCC "decode.refragment.encode" #-} decode (f (encode a))
 
@@ -287,7 +287,7 @@ prop_partialOnlyOnce = property $
        _ -> error $ "not partial, error!"
 
 -- read too much
-prop_readTooMuch :: (Eq a, Binary a) => a -> Bool
+prop_readTooMuch :: (Eq a, Restore a) => a -> Bool
 prop_readTooMuch x = mustThrowError $ x == a && x /= b
   where
     -- encode 'a', but try to read 'b' too
@@ -352,7 +352,7 @@ prop_readTooMuch x = mustThrowError $ x == a && x /= b
 -- To make sure that the property holds no matter what refragmentation we use,
 -- we test exhaustively for a single chunk, and all ways to break the string
 -- into 2, 3 and 4 chunks.
-prop_lookAheadIndepOfChunking :: (Eq a, Binary a) => a -> Property
+prop_lookAheadIndepOfChunking :: (Eq a, Restore a) => a -> Property
 prop_lookAheadIndepOfChunking testInput =
    forAll (testCuts (L.length (encode testInput))) $
      roundTrip testInput . rechunk
@@ -379,7 +379,7 @@ prop_lookAheadIndepOfChunking testInput =
                         in bs0 : cut is bs1
 
         fromChunks :: [B.ByteString] ->  L.ByteString
-        fromChunks []       = error "Binary should not have to ask for this chunk!"
+        fromChunks []       = error "Restore should not have to ask for this chunk!"
         fromChunks (bs:bss) = L.Chunk bs (fromChunks bss)
 
 -- String utilities
@@ -440,7 +440,7 @@ invariant_lbs :: L.ByteString -> Bool
 invariant_lbs (L.Empty)      = True
 invariant_lbs (L.Chunk x xs) = not (B.null x) && invariant_lbs xs
 
-prop_invariant :: (Binary a) => a -> Bool
+prop_invariant :: (Restore a) => a -> Bool
 prop_invariant = invariant_lbs . encode
 
 -- refragment a lazy bytestring's chunks
@@ -477,7 +477,7 @@ genIntegerBig = do
   x <- arbitrarySizedIntegral :: Gen Integer
   -- arbitrarySizedIntegral generates numbers smaller than
   -- (maxBound :: Word32), so let's make them bigger to better test
-  -- the Binary instance.
+  -- the Restore instance.
   return (x + fromIntegral (maxBound :: Word32))
 
 #ifdef HAS_NATURAL
@@ -494,7 +494,7 @@ genNaturalBig = do
   x <- arbitrarySizedNatural :: Gen Natural
   -- arbitrarySizedNatural generates numbers smaller than
   -- (maxBound :: Word64), so let's make them bigger to better test
-  -- the Binary instance.
+  -- the Restore instance.
   return (x + fromIntegral (maxBound :: Word64))
 #endif
 
@@ -535,7 +535,7 @@ type B a = a -> Bool
 p :: (Testable p) => p -> Property
 p = property
 
-test    :: (Eq a, Binary a) => a -> Property
+test    :: (Eq a, Restore a) => a -> Property
 test a  = forAll positiveList (roundTrip a . refragment)
 
 test' :: (Show a, Arbitrary a) => String -> (a -> Property) -> ([a] -> Property) -> Test
@@ -545,7 +545,7 @@ test' desc prop propList =
     testProperty ("[" ++ desc ++ "]") propList
   ]
 
-testWithGen :: (Show a, Eq a, Binary a) => String -> Gen a -> Test
+testWithGen :: (Show a, Eq a, Restore a) => String -> Gen a -> Test
 testWithGen desc gen =
   testGroup desc [
     testProperty desc (forAll gen test),
@@ -620,7 +620,7 @@ tests =
             , testProperty "getRemainingLazyByteString" prop_getRemainingLazyByteString
             ]
 
-        , testGroup "Using Binary class, refragmented ByteString"
+        , testGroup "Using Restore class, refragmented ByteString"
             [ test' "()"          (test :: T ()         ) test
             , test' "Bool"        (test :: T Bool       ) test
             , test' "Char"        (test :: T Char       ) test

@@ -4,7 +4,7 @@
 -- RankNTypes forall r. statement
 -- MagicHash the (# unboxing #), also needs GHC.primitives
 
-module Data.Binary.Get.Internal (
+module Data.Restore.Get.Internal (
 
     -- * The Get type
       Get
@@ -53,7 +53,7 @@ import Control.Monad
 import qualified Control.Monad.Fail as Fail
 #endif
 
-import Data.Binary.Internal ( accursedUnutterablePerformIO )
+import Data.Restore.Internal ( accursedUnutterablePerformIO )
 
 -- Kolmodin 20100427: at zurihac we discussed of having partial take a
 -- "Maybe ByteString" and implemented it in this way.
@@ -271,14 +271,14 @@ getBytes = getByteString
 
 -- | @since 0.7.0.0
 instance Alternative Get where
-  empty = C $ \inp _ks -> Fail inp "Data.Binary.Get(Alternative).empty"
+  empty = C $ \inp _ks -> Fail inp "Data.Restore.Get(Alternative).empty"
   {-# INLINE empty #-}
   (<|>) f g = do
     (decoder, bs) <- runAndKeepTrack f
     case decoder of
       Done inp x -> C $ \_ ks -> ks inp x
       Fail _ _ -> pushBack bs >> g
-      _ -> error "Binary: impossible"
+      _ -> error "Restore: impossible"
   {-# INLINE (<|>) #-}
   some p = (:) <$> p <*> many p
   {-# INLINE some #-}
@@ -324,7 +324,7 @@ lookAhead g = do
   case decoder of
     Done _ a -> pushBack bs >> return a
     Fail inp s -> C $ \_ _ -> Fail inp s
-    _ -> error "Binary: impossible"
+    _ -> error "Restore: impossible"
 
 -- | Run the given decoder, and only consume its input if it returns 'Just'.
 -- If 'Nothing' is returned, the input will be unconsumed.
@@ -348,7 +348,7 @@ lookAheadE g = do
     Done _ (Left x) -> pushBack bs >> return (Left x)
     Done inp (Right x) -> C $ \_ ks -> ks inp (Right x)
     Fail inp s -> C $ \_ _ -> Fail inp s
-    _ -> error "Binary: impossible"
+    _ -> error "Restore: impossible"
 
 -- | Label a decoder. If the decoder fails, the label will be appended on
 -- a new line to the error message string.

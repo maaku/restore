@@ -7,7 +7,7 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      : Data.Binary.Get
+-- Module      : Data.Restore.Get
 -- Copyright   : Lennart Kolmodin
 -- License     : BSD3-style (see LICENSE)
 --
@@ -21,7 +21,7 @@
 -- Primitives are available to decode words of various sizes, both big and
 -- little endian.
 --
--- Let's decode binary data representing illustrated here.
+-- Let's decode restore data representing illustrated here.
 -- In this example the values are in little endian.
 --
 -- > +------------------+--------------+-----------------+
@@ -128,7 +128,7 @@
 -----------------------------------------------------------------------------
 
 
-module Data.Binary.Get (
+module Data.Restore.Get (
 
     -- * The Get monad
       Get
@@ -229,8 +229,8 @@ import qualified Data.ByteString.Unsafe as B
 import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString.Lazy.Internal as L
 
-import Data.Binary.Get.Internal hiding ( Decoder(..), runGetIncremental, runGetIncremental')
-import qualified Data.Binary.Get.Internal as I
+import Data.Restore.Get.Internal hiding ( Decoder(..), runGetIncremental, runGetIncremental')
+import qualified Data.Restore.Get.Internal as I
 
 #if defined(__GLASGOW_HASKELL__) && !defined(__HADDOCK__)
 -- needed for (# unboxing #) with magic hash
@@ -239,7 +239,7 @@ import GHC.Word
 #endif
 
 -- needed for casting words to float/double
-import Data.Binary.FloatCast (wordToFloat, wordToDouble)
+import Data.Restore.FloatCast (wordToFloat, wordToDouble)
 
 -- $lazyinterface
 -- The lazy interface consumes a single lazy 'L.ByteString'. It's the easiest
@@ -315,7 +315,7 @@ runGetState g lbs0 pos' = go (runGetIncremental g) lbs0
   go (Done s pos a) lbs = (a, L.chunk s lbs, pos+pos')
   go (Partial k) lbs = go (k (takeHeadChunk lbs)) (dropHeadChunk lbs)
   go (Fail _ pos msg) _ =
-    error ("Data.Binary.Get.runGetState at position " ++ show pos ++ ": " ++ msg)
+    error ("Data.Restore.Get.runGetState at position " ++ show pos ++ ": " ++ msg)
 
 takeHeadChunk :: L.ByteString -> Maybe B.ByteString
 takeHeadChunk lbs =
@@ -354,7 +354,7 @@ runGet g lbs0 = feedAll (runGetIncremental g) lbs0
   feedAll (Done _ _ x) _ = x
   feedAll (Partial k) lbs = feedAll (k (takeHeadChunk lbs)) (dropHeadChunk lbs)
   feedAll (Fail _ pos msg) _ =
-    error ("Data.Binary.Get.runGet at position " ++ show pos ++ ": " ++ msg)
+    error ("Data.Restore.Get.runGet at position " ++ show pos ++ ": " ++ msg)
 
 
 -- | Feed a 'Decoder' with more input. If the 'Decoder' is 'Done' or 'Fail' it

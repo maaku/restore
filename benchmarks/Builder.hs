@@ -19,7 +19,7 @@ import qualified Data.ByteString.Lazy as L
 import Data.Char (ord)
 import Data.Word (Word8)
 
-import Data.Binary.Builder
+import Data.Restore.Builder
 
 main :: IO ()
 main = do

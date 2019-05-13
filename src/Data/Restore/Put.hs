@@ -8,7 +8,7 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      : Data.Binary.Put
+-- Module      : Data.Restore.Put
 -- Copyright   : Lennart Kolmodin
 -- License     : BSD3-style (see LICENSE)
 --
@@ -20,7 +20,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Data.Binary.Put (
+module Data.Restore.Put (
 
     -- * The Put type
       Put
@@ -81,8 +81,8 @@ module Data.Binary.Put (
   ) where
 
 import qualified Data.Monoid as Monoid
-import Data.Binary.Builder (Builder, toLazyByteString)
-import qualified Data.Binary.Builder as B
+import Data.Restore.Builder (Builder, toLazyByteString)
+import qualified Data.Restore.Builder as B
 
 import Data.Int
 import Data.Word
@@ -100,7 +100,7 @@ import Control.Applicative
 import Prelude -- Silence AMP warning.
 
 -- needed for casting Floats/Doubles to words.
-import Data.Binary.FloatCast (floatToWord, doubleToWord)
+import Data.Restore.FloatCast (floatToWord, doubleToWord)
 
 ------------------------------------------------------------------------
 

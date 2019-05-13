@@ -9,7 +9,7 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      : Data.Binary.Generic
+-- Module      : Data.Restore.Generic
 -- Copyright   : Bryan O'Sullivan
 -- License     : BSD3-style (see LICENSE)
 --
@@ -20,14 +20,14 @@
 -- Instances for supporting GHC generics.
 --
 -----------------------------------------------------------------------------
-module Data.Binary.Generic
+module Data.Restore.Generic
     (
     ) where
 
 import Control.Applicative
-import Data.Binary.Class
-import Data.Binary.Get
-import Data.Binary.Put
+import Data.Restore.Class
+import Data.Restore.Get
+import Data.Restore.Put
 import Data.Bits
 import Data.Word
 #if !MIN_VERSION_base(4,11,0)
@@ -40,43 +40,43 @@ import GHC.Generics
 import Prelude -- Silence AMP warning.
 
 -- Type without constructors
-instance GBinaryPut V1 where
+instance GRestorePut V1 where
     gput _ = pure ()
 
-instance GBinaryGet V1 where
+instance GRestoreGet V1 where
     gget   = return undefined
 
 -- Constructor without arguments
-instance GBinaryPut U1 where
+instance GRestorePut U1 where
     gput U1 = pure ()
 
-instance GBinaryGet U1 where
+instance GRestoreGet U1 where
     gget    = return U1
 
 -- Product: constructor with parameters
-instance (GBinaryPut a, GBinaryPut b) => GBinaryPut (a :*: b) where
+instance (GRestorePut a, GRestorePut b) => GRestorePut (a :*: b) where
     gput (x :*: y) = gput x <> gput y
 
-instance (GBinaryGet a, GBinaryGet b) => GBinaryGet (a :*: b) where
+instance (GRestoreGet a, GRestoreGet b) => GRestoreGet (a :*: b) where
     gget = (:*:) <$> gget <*> gget
 
 -- Metadata (constructor name, etc)
-instance GBinaryPut a => GBinaryPut (M1 i c a) where
+instance GRestorePut a => GRestorePut (M1 i c a) where
     gput = gput . unM1
 
-instance GBinaryGet a => GBinaryGet (M1 i c a) where
+instance GRestoreGet a => GRestoreGet (M1 i c a) where
     gget = M1 <$> gget
 
 -- Constants, additional parameters, and rank-1 recursion
-instance Binary a => GBinaryPut (K1 i a) where
+instance Restore a => GRestorePut (K1 i a) where
     gput = put . unK1
 
-instance Binary a => GBinaryGet (K1 i a) where
+instance Restore a => GRestoreGet (K1 i a) where
     gget = K1 <$> get
 
 -- Borrowed from the cereal package.
 
--- The following GBinary instance for sums has support for serializing
+-- The following GRestore instance for sums has support for serializing
 -- types with up to 2^64-1 constructors. It will use the minimal
 -- number of bytes needed to encode the constructor. For example when
 -- a type has 2^8 constructors or less it will use a single byte to
@@ -88,14 +88,14 @@ instance Binary a => GBinaryGet (K1 i a) where
 #define GETSUM(WORD) GUARD(WORD) = (get :: Get WORD) >>= checkGetSum (fromIntegral size)
 
 instance ( GSumPut  a, GSumPut  b
-         , SumSize    a, SumSize    b) => GBinaryPut (a :+: b) where
+         , SumSize    a, SumSize    b) => GRestorePut (a :+: b) where
     gput | PUTSUM(Word8) | PUTSUM(Word16) | PUTSUM(Word32) | PUTSUM(Word64)
          | otherwise = sizeError "encode" size
       where
         size = unTagged (sumSize :: Tagged (a :+: b) Word64)
 
 instance ( GSumGet  a, GSumGet  b
-         , SumSize    a, SumSize    b) => GBinaryGet (a :+: b) where
+         , SumSize    a, SumSize    b) => GRestoreGet (a :+: b) where
     gget | GETSUM(Word8) | GETSUM(Word16) | GETSUM(Word32) | GETSUM(Word64)
          | otherwise = sizeError "decode" size
       where
@@ -117,7 +117,7 @@ class GSumGet f where
     getSum :: (Ord word, Num word, Bits word) => word -> word -> Get (f a)
 
 class GSumPut f where
-    putSum :: (Num w, Bits w, Binary w) => w -> w -> f a -> Put
+    putSum :: (Num w, Bits w, Restore w) => w -> w -> f a -> Put
 
 instance (GSumGet a, GSumGet b) => GSumGet (a :+: b) where
     getSum !code !size | code < sizeL = L1 <$> getSum code           sizeL
@@ -134,10 +134,10 @@ instance (GSumPut a, GSumPut b) => GSumPut (a :+: b) where
           sizeL = size `shiftR` 1
           sizeR = size - sizeL
 
-instance GBinaryGet a => GSumGet (C1 c a) where
+instance GRestoreGet a => GSumGet (C1 c a) where
     getSum _ _ = gget
 
-instance GBinaryPut a => GSumPut (C1 c a) where
+instance GRestorePut a => GSumPut (C1 c a) where
     putSum !code _ x = put code <> gput x
 
 ------------------------------------------------------------------------

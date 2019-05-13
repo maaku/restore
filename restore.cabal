@@ -1,10 +1,10 @@
-name:            binary
+name:            restore
 version:         0.8.7.0
 license:         BSD3
 license-file:    LICENSE
 author:          Lennart Kolmodin <kolmodin@gmail.com>
 maintainer:      Lennart Kolmodin, Don Stewart <dons00@gmail.com>
-homepage:        https://github.com/kolmodin/binary
+homepage:        https://github.com/maaku/restore
 description:     Efficient, pure binary serialisation using lazy ByteStrings.
                  Haskell values may be encoded to and from binary formats,
                  written to disk as binary, or sent over the network.
@@ -20,7 +20,7 @@ build-type:      Simple
 cabal-version:   >= 1.8
 tested-with:     GHC == 7.6.3, GHC == 7.8.4, GHC == 7.10.3, GHC == 8.0.2, GHC ==8.2.2, GHC == 8.4.4, GHC == 8.6.5
 extra-source-files:
-  README.md changelog.md docs/hcar/binary-Lb.tex tools/derive/*.hs
+  README.md changelog.md docs/hcar/restore-Lb.tex tools/derive/*.hs
 
 -- from the benchmark 'bench'
 extra-source-files:
@@ -28,21 +28,21 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: git://github.com/kolmodin/binary.git
+  location: git://github.com/maaku/restore.git
 
 library
   build-depends:   base >= 4.5.0.0 && < 5, bytestring >= 0.10.4, containers, array
   hs-source-dirs:  src
-  exposed-modules: Data.Binary,
-                   Data.Binary.Put,
-                   Data.Binary.Get,
-                   Data.Binary.Get.Internal,
-                   Data.Binary.Builder
+  exposed-modules: Data.Restore,
+                   Data.Restore.Put,
+                   Data.Restore.Get,
+                   Data.Restore.Get.Internal,
+                   Data.Restore.Builder
 
-  other-modules:   Data.Binary.Class,
-                   Data.Binary.Internal,
-                   Data.Binary.Generic,
-                   Data.Binary.FloatCast
+  other-modules:   Data.Restore.Class,
+                   Data.Restore.Internal,
+                   Data.Restore.Generic,
+                   Data.Restore.FloatCast
   if impl(ghc <= 7.6)
     -- prior to ghc-7.4 generics lived in ghc-prim
     build-depends: ghc-prim
@@ -53,9 +53,9 @@ library
     ghc-options: -Wcompat -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances
 
 -- Due to circular dependency, we cannot make any of the test-suites or
--- benchmark depend on the binary library. Instead, for each test-suite and
--- benchmark, we include the source directory of binary and build-depend on all
--- the dependencies binary has.
+-- benchmark depend on the restore library. Instead, for each test-suite and
+-- benchmark, we include the source directory of restore and build-depend on all
+-- the dependencies restore has.
 
 test-suite qc
   type:  exitcode-stdio-1.0
@@ -65,15 +65,15 @@ test-suite qc
     Action
     Arbitrary
   other-modules:
-    Data.Binary
-    Data.Binary.Builder
-    Data.Binary.Class
-    Data.Binary.FloatCast
-    Data.Binary.Generic
-    Data.Binary.Get
-    Data.Binary.Get.Internal
-    Data.Binary.Internal
-    Data.Binary.Put
+    Data.Restore
+    Data.Restore.Builder
+    Data.Restore.Class
+    Data.Restore.FloatCast
+    Data.Restore.Generic
+    Data.Restore.Get
+    Data.Restore.Get.Internal
+    Data.Restore.Internal
+    Data.Restore.Put
   build-depends:
     base >= 4.5.0.0 && < 5,
     base-orphans >=0.8.1 && <0.9,
@@ -83,7 +83,7 @@ test-suite qc
     test-framework-quickcheck2 >= 0.3,
     QuickCheck >= 2.9
 
-  -- build dependencies from using binary source rather than depending on the library
+  -- build dependencies from using restore source rather than depending on the library
   build-depends: array, containers
   ghc-options: -Wall -O2 -threaded
   if impl(ghc <= 7.6)
@@ -96,15 +96,15 @@ test-suite read-write-file
   hs-source-dirs: src tests
   main-is: File.hs
   other-modules:
-    Data.Binary
-    Data.Binary.Builder
-    Data.Binary.Class
-    Data.Binary.FloatCast
-    Data.Binary.Generic
-    Data.Binary.Get
-    Data.Binary.Get.Internal
-    Data.Binary.Internal
-    Data.Binary.Put
+    Data.Restore
+    Data.Restore.Builder
+    Data.Restore.Class
+    Data.Restore.FloatCast
+    Data.Restore.Generic
+    Data.Restore.Get
+    Data.Restore.Get.Internal
+    Data.Restore.Internal
+    Data.Restore.Put
   build-depends:
     base >= 4.5.0.0 && < 5,
     bytestring >= 0.10.4,
@@ -113,7 +113,7 @@ test-suite read-write-file
     filepath,
     HUnit
 
-  -- build dependencies from using binary source rather than depending on the library
+  -- build dependencies from using restore source rather than depending on the library
   build-depends: array, containers
   ghc-options: -Wall
   if impl(ghc <= 7.6)
@@ -127,19 +127,19 @@ benchmark bench
   main-is: Benchmark.hs
   other-modules:
     MemBench
-    Data.Binary
-    Data.Binary.Builder
-    Data.Binary.Class
-    Data.Binary.FloatCast
-    Data.Binary.Generic
-    Data.Binary.Get
-    Data.Binary.Get.Internal
-    Data.Binary.Internal
-    Data.Binary.Put
+    Data.Restore
+    Data.Restore.Builder
+    Data.Restore.Class
+    Data.Restore.FloatCast
+    Data.Restore.Generic
+    Data.Restore.Get
+    Data.Restore.Get.Internal
+    Data.Restore.Internal
+    Data.Restore.Put
   build-depends:
     base >= 4.5.0.0 && < 5,
     bytestring >= 0.10.4
-  -- build dependencies from using binary source rather than depending on the library
+  -- build dependencies from using restore source rather than depending on the library
   build-depends: array, containers
   c-sources: benchmarks/CBenchmark.c
   include-dirs: benchmarks
@@ -154,15 +154,15 @@ benchmark get
   hs-source-dirs: src benchmarks
   main-is: Get.hs
   other-modules:
-    Data.Binary
-    Data.Binary.Builder
-    Data.Binary.Class
-    Data.Binary.FloatCast
-    Data.Binary.Generic
-    Data.Binary.Get
-    Data.Binary.Get.Internal
-    Data.Binary.Internal
-    Data.Binary.Put
+    Data.Restore
+    Data.Restore.Builder
+    Data.Restore.Class
+    Data.Restore.FloatCast
+    Data.Restore.Generic
+    Data.Restore.Get
+    Data.Restore.Get.Internal
+    Data.Restore.Internal
+    Data.Restore.Put
   build-depends:
     attoparsec,
     base >= 4.5.0.0 && < 5,
@@ -171,7 +171,7 @@ benchmark get
     criterion == 1.*,
     deepseq,
     mtl
-  -- build dependencies from using binary source rather than depending on the library
+  -- build dependencies from using restore source rather than depending on the library
   build-depends: array, containers
   ghc-options: -O2 -Wall
   if impl(ghc <= 7.6)
@@ -184,21 +184,21 @@ benchmark put
   hs-source-dirs: src benchmarks
   main-is: Put.hs
   other-modules:
-    Data.Binary
-    Data.Binary.Builder
-    Data.Binary.Class
-    Data.Binary.FloatCast
-    Data.Binary.Generic
-    Data.Binary.Get
-    Data.Binary.Get.Internal
-    Data.Binary.Internal
-    Data.Binary.Put
+    Data.Restore
+    Data.Restore.Builder
+    Data.Restore.Class
+    Data.Restore.FloatCast
+    Data.Restore.Generic
+    Data.Restore.Get
+    Data.Restore.Get.Internal
+    Data.Restore.Internal
+    Data.Restore.Put
   build-depends:
     base >= 4.5.0.0 && < 5,
     bytestring >= 0.10.4,
     criterion == 1.*,
     deepseq
-  -- build dependencies from using binary source rather than depending on the library
+  -- build dependencies from using restore source rather than depending on the library
   build-depends: array, containers
   ghc-options: -O2 -Wall
   if impl(ghc <= 7.6)
@@ -210,15 +210,15 @@ benchmark generics-bench
   hs-source-dirs: src benchmarks
   main-is: GenericsBench.hs
   other-modules:
-    Data.Binary
-    Data.Binary.Builder
-    Data.Binary.Class
-    Data.Binary.FloatCast
-    Data.Binary.Generic
-    Data.Binary.Get
-    Data.Binary.Get.Internal
-    Data.Binary.Internal
-    Data.Binary.Put
+    Data.Restore
+    Data.Restore.Builder
+    Data.Restore.Class
+    Data.Restore.FloatCast
+    Data.Restore.Generic
+    Data.Restore.Get
+    Data.Restore.Get.Internal
+    Data.Restore.Internal
+    Data.Restore.Put
   build-depends:
     base >= 4.5.0.0 && < 5,
     bytestring >= 0.10.4,
@@ -236,7 +236,7 @@ benchmark generics-bench
     Cabal24
     GenericsBenchCache
     GenericsBenchTypes
-  -- build dependencies from using binary source rather than depending on the library
+  -- build dependencies from using restore source rather than depending on the library
   build-depends: array, containers
   ghc-options: -O2 -Wall
   if impl(ghc <= 7.6)
@@ -248,22 +248,22 @@ benchmark builder
   hs-source-dirs: src benchmarks
   main-is: Builder.hs
   other-modules:
-    Data.Binary
-    Data.Binary.Builder
-    Data.Binary.Class
-    Data.Binary.FloatCast
-    Data.Binary.Generic
-    Data.Binary.Get
-    Data.Binary.Get.Internal
-    Data.Binary.Internal
-    Data.Binary.Put
+    Data.Restore
+    Data.Restore.Builder
+    Data.Restore.Class
+    Data.Restore.FloatCast
+    Data.Restore.Generic
+    Data.Restore.Get
+    Data.Restore.Get.Internal
+    Data.Restore.Internal
+    Data.Restore.Put
   build-depends:
     base >= 4.5.0.0 && < 5,
     bytestring >= 0.10.4,
     criterion == 1.*,
     deepseq,
     mtl
-  -- build dependencies from using binary source rather than depending on the library
+  -- build dependencies from using restore source rather than depending on the library
   build-depends: array, containers
   ghc-options: -O2
   if impl(ghc <= 7.6)

@@ -2,14 +2,14 @@
 
 import Data.Generics
 
-import Data.Binary
+import Data.Restore
 
-import BinaryDerive
+import RestoreDerive
 
 data Foo = Bar
     deriving (Typeable, Data, Show, Eq)
 
-instance Binary Main.Foo where
+instance Restore Main.Foo where
   put Bar = return ()
   get = return Bar
 
@@ -17,7 +17,7 @@ data Color = RGB Int Int Int
            | CMYK Int Int Int Int
     deriving (Typeable, Data, Show, Eq)
 
-instance Binary Main.Color where
+instance Restore Main.Color where
   put (RGB a b c) = putWord8 0 >> put a >> put b >> put c
   put (CMYK a b c d) = putWord8 1 >> put a >> put b >> put c >> put d
   get = do
@@ -30,7 +30,7 @@ data Computer = Laptop { weight :: Int }
               | Desktop { speed :: Int, memory :: Int }
     deriving (Typeable, Data, Show, Eq)
 
-instance Binary Main.Computer where
+instance Restore Main.Computer where
   put (Laptop a) = putWord8 0 >> put a
   put (Desktop a b) = putWord8 1 >> put a >> put b
   get = do
@@ -49,7 +49,7 @@ data Exp = ExpOr Exp Exp
          | ExpInt Int
     deriving (Typeable, Data, Show, Eq)
 
-instance Binary Main.Exp where
+instance Restore Main.Exp where
   put (ExpOr a b) = putWord8 0 >> put a >> put b
   put (ExpAnd a b) = putWord8 1 >> put a >> put b
   put (ExpEq a b) = putWord8 2 >> put a >> put b

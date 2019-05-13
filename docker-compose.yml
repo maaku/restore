@@ -12,7 +12,7 @@
 #
 # To read logs from a build:
 #
-#  $ docker-compose logs binary_binary_ghc842
+#  $ docker-compose logs restore_restore_ghc842
 #
 # To cancel or clean up when finished:
 #  
@@ -22,7 +22,7 @@
 
 version: '3'
 services:
-  binary_ghc861:
+  restore_ghc861:
     build:
       context: .
       dockerfile: docker/Dockerfile.anyghc
@@ -31,7 +31,7 @@ services:
     volumes:
      - cabal-store-cache:/root/.cabal/store
 
-  binary_ghc843:
+  restore_ghc843:
     build:
       context: .
       dockerfile: docker/Dockerfile.anyghc
@@ -40,7 +40,7 @@ services:
     volumes:
      - cabal-store-cache:/root/.cabal/store
 
-  binary_ghc822:
+  restore_ghc822:
     build:
       context: .
       dockerfile: docker/Dockerfile.anyghc
@@ -49,7 +49,7 @@ services:
     volumes:
      - cabal-store-cache:/root/.cabal/store
 
-  binary_ghc802:
+  restore_ghc802:
     build:
       context: .
       dockerfile: docker/Dockerfile.anyghc
@@ -58,7 +58,7 @@ services:
     volumes:
      - cabal-store-cache:/root/.cabal/store
 
-  binary_ghc7103:
+  restore_ghc7103:
     build:
       context: .
       dockerfile: docker/Dockerfile.anyghc
@@ -67,7 +67,7 @@ services:
     volumes:
      - cabal-store-cache:/root/.cabal/store
 
-  binary_ghc784:
+  restore_ghc784:
     build:
       context: .
       dockerfile: docker/Dockerfile.anyghc
@@ -76,7 +76,7 @@ services:
     volumes:
      - cabal-store-cache:/root/.cabal/store
 
-  binary_ghc763:
+  restore_ghc763:
     build:
       context: .
       dockerfile: docker/Dockerfile.anyghc
@@ -85,7 +85,7 @@ services:
     volumes:
      - cabal-store-cache:/root/.cabal/store
 
-  binary_ghc742:
+  restore_ghc742:
     build:
       context: .
       dockerfile: docker/Dockerfile.anyghc

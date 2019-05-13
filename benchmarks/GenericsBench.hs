@@ -6,9 +6,9 @@ import           Cabal24 (PackageDescription)
 
 import           Criterion.Main
 
-import qualified Data.Binary                     as Binary
-import           Data.Binary.Get                 (Get)
-import qualified Data.Binary.Get                 as Binary
+import qualified Data.Restore                     as Restore
+import           Data.Restore.Get                 (Get)
+import qualified Data.Restore.Get                 as Restore
 
 import           GenericsBenchCache
 
@@ -32,20 +32,20 @@ benchmark pds = do
     ]
 
 encode :: [PackageDescription] -> L.ByteString
-encode = Binary.encode
+encode = Restore.encode
 
 decode :: L.ByteString -> Int
-decode = length . (Binary.decode :: L.ByteString -> [PackageDescription])
+decode = length . (Restore.decode :: L.ByteString -> [PackageDescription])
 
 decodeNull :: L.ByteString -> ()
 decodeNull =
-  Binary.runGet $ do
-    n <- Binary.get :: Get Int
+  Restore.runGet $ do
+    n <- Restore.get :: Get Int
     go n
   where
     go 0 = return ()
     go i = do
-      x <- Binary.get :: Get PackageDescription
+      x <- Restore.get :: Get PackageDescription
       x `seq` go (i-1)
 
 readPackageDescription :: String -> Int

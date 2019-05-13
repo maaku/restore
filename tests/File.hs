@@ -12,11 +12,11 @@ import           Test.HUnit
 import           Distribution.Simple.Utils (withTempDirectory)
 import           Distribution.Verbosity    (silent)
 
-import           Data.Binary
+import           Data.Restore
 
 data Foo = Bar !Word32 !Word32 !Word32 deriving (Eq, Show)
 
-instance Binary Foo where
+instance Restore Foo where
   get = Bar <$> get <*> get <*> get
   put (Bar a b c) = put (a,b,c)
 

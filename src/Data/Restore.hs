@@ -2,7 +2,7 @@
 {-# LANGUAGE Trustworthy #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      : Data.Binary
+-- Module      : Data.Restore
 -- Copyright   : Lennart Kolmodin
 -- License     : BSD3-style (see LICENSE)
 --
@@ -11,43 +11,43 @@
 -- Portability : portable to Hugs and GHC. Requires the FFI and some flexible instances.
 --
 -- Binary serialisation of Haskell values to and from lazy 'ByteString's.
--- The Binary library provides methods for encoding Haskell values as
+-- The Restore library provides methods for encoding Haskell values as
 -- streams of bytes directly in memory. The resulting 'ByteString' can
 -- then be written to disk, sent over the network, or further processed
 -- (for example, compressed with gzip).
 --
--- The @binary@ package is notable in that it provides both pure, and
+-- The @restore@ package is notable in that it provides both pure, and
 -- high performance serialisation.
 --
--- Values encoded using the 'Binary' class are always encoded in network order
+-- Values encoded using the 'Restore' class are always encoded in network order
 -- (big endian) form, and encoded data should be portable across
 -- machine endianness, word size, or compiler version. For example,
--- data encoded using the 'Binary' class could be written on any machine,
+-- data encoded using the 'Restore' class could be written on any machine,
 -- and read back on any another.
 --
 -- If the specifics of the data format is not important to you, for example,
 -- you are more interested in serializing and deserializing values than
--- in which format will be used, it is possible to derive 'Binary'
--- instances using the generic support. See 'GBinaryGet' and
--- 'GBinaryPut'.
+-- in which format will be used, it is possible to derive 'Restore'
+-- instances using the generic support. See 'GRestoreGet' and
+-- 'GRestorePut'.
 --
 -- If you have specific requirements about the encoding format, you can use
 -- the encoding and decoding primitives directly, see the modules
--- "Data.Binary.Get" and "Data.Binary.Put".
+-- "Data.Restore.Get" and "Data.Restore.Put".
 --
 -----------------------------------------------------------------------------
 
-module Data.Binary (
+module Data.Restore (
 
-    -- * The Binary class
-      Binary(..)
+    -- * The Restore class
+      Restore(..)
     -- ** Example
     -- $example
 
     -- * Generic support
     -- $generics
-    , GBinaryGet(..)
-    , GBinaryPut(..)
+    , GRestoreGet(..)
+    , GRestorePut(..)
 
     -- * The Get and Put monads
     , Get
@@ -58,13 +58,13 @@ module Data.Binary (
     , getWord8
 
     -- * Binary serialisation
-    , encode                    -- :: Binary a => a -> ByteString
-    , decode                    -- :: Binary a => ByteString -> a
+    , encode                    -- :: Restore a => a -> ByteString
+    , decode                    -- :: Restore a => ByteString -> a
     , decodeOrFail
 
     -- * IO functions for serialisation
-    , encodeFile                -- :: Binary a => FilePath -> a -> IO ()
-    , decodeFile                -- :: Binary a => FilePath -> IO a
+    , encodeFile                -- :: Restore a => FilePath -> a -> IO ()
+    , decodeFile                -- :: Restore a => FilePath -> IO a
     , decodeFileOrFail
 
     , module Data.Word -- useful
@@ -73,10 +73,10 @@ module Data.Binary (
 
 import Data.Word
 
-import Data.Binary.Class
-import Data.Binary.Put
-import Data.Binary.Get
-import Data.Binary.Generic ()
+import Data.Restore.Class
+import Data.Restore.Put
+import Data.Restore.Get
+import Data.Restore.Generic ()
 
 import qualified Data.ByteString as B ( hGet, length )
 import Data.ByteString.Lazy (ByteString)
@@ -87,7 +87,7 @@ import System.IO ( withBinaryFile, IOMode(ReadMode) )
 ------------------------------------------------------------------------
 
 -- $example
--- To serialise a custom type, an instance of Binary for that type is
+-- To serialise a custom type, an instance of Restore for that type is
 -- required. For example, suppose we have a data structure:
 --
 -- > data Exp = IntE Int
@@ -98,7 +98,7 @@ import System.IO ( withBinaryFile, IOMode(ReadMode) )
 -- following instance, which proceeds by recursively breaking down the
 -- structure to serialise:
 --
--- > instance Binary Exp where
+-- > instance Restore Exp where
 -- >       put (IntE i)      = do put (0 :: Word8)
 -- >                              put i
 -- >       put (OpE s e1 e2) = do put (1 :: Word8)
@@ -132,7 +132,7 @@ import System.IO ( withBinaryFile, IOMode(ReadMode) )
 -- > > let e = OpE "*" (IntE 7) (OpE "/" (IntE 4) (IntE 2))
 -- > > let v = encode e
 --
--- Where @v@ is a binary encoded data structure. To reconstruct the
+-- Where @v@ is a restore encoded data structure. To reconstruct the
 -- original data, we use 'decode'
 --
 -- > > decode v :: Exp
@@ -164,12 +164,12 @@ import System.IO ( withBinaryFile, IOMode(ReadMode) )
 
 -- | Encode a value using binary serialisation to a lazy ByteString.
 --
-encode :: Binary a => a -> ByteString
+encode :: Restore a => a -> ByteString
 encode = runPut . put
 {-# INLINE encode #-}
 
 -- | Decode a value from a lazy ByteString, reconstructing the original structure.
-decode :: Binary a => ByteString -> a
+decode :: Restore a => ByteString -> a
 decode = runGet get
 
 -- | Decode a value from a lazy ByteString. Returning 'Left' on failure and
@@ -178,7 +178,7 @@ decode = runGet get
 -- message will be returned as well.
 --
 -- @since 0.7.0.0
-decodeOrFail :: Binary a => L.ByteString
+decodeOrFail :: Restore a => L.ByteString
              -> Either (L.ByteString, ByteOffset, String)
                        (L.ByteString, ByteOffset, a)
 decodeOrFail = runGetOrFail get
@@ -197,14 +197,14 @@ decodeOrFail = runGetOrFail get
 --
 -- > B.writeFile f . compress . encode
 --
-encodeFile :: Binary a => FilePath -> a -> IO ()
+encodeFile :: Restore a => FilePath -> a -> IO ()
 encodeFile f v = L.writeFile f (encode v)
 
 -- | Decode a value from a file. In case of errors, 'error' will
 -- be called with the error message.
 --
 -- @since 0.7.0.0
-decodeFile :: Binary a => FilePath -> IO a
+decodeFile :: Restore a => FilePath -> IO a
 decodeFile f = do
   result <- decodeFileOrFail f
   case result of
@@ -214,7 +214,7 @@ decodeFile f = do
 -- | Decode a value from a file. In case of success, the value will be returned
 -- in 'Right'. In case of decoder errors, the error message together with
 -- the byte offset will be returned.
-decodeFileOrFail :: Binary a => FilePath -> IO (Either (ByteOffset, String) a)
+decodeFileOrFail :: Restore a => FilePath -> IO (Either (ByteOffset, String) a)
 decodeFileOrFail f =
   withBinaryFile f ReadMode (pushFromHandle (runGetIncremental get))
 
@@ -226,14 +226,14 @@ decodeFileOrFail f =
 --
 -- > {-# LANGUAGE DeriveGeneric #-}
 -- >
--- > import Data.Binary
+-- > import Data.Restore
 -- > import GHC.Generics (Generic)
 -- >
 -- > data Foo = Foo
 -- >          deriving (Generic)
 -- >
 -- > -- GHC will automatically fill out the instance
--- > instance Binary Foo
+-- > instance Restore Foo
 --
 -- This mechanism makes use of GHC's efficient built-in generics
 -- support.

@@ -1,6 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module BinaryDerive where
+module RestoreDerive where
 
 import Data.Generics
 import Data.List
@@ -10,12 +10,12 @@ deriveM (a :: a) = mapM_ putStrLn . lines $ derive (undefined :: a)
 
 derive :: (Typeable a, Data a) => a -> String
 derive x = 
-    "instance " ++ context ++ "Binary " ++ inst ++ " where\n" ++
+    "instance " ++ context ++ "Restore " ++ inst ++ " where\n" ++
     concat putDefs ++ getDefs
     where
     context
         | nTypeChildren > 0 =
-            wrap (join ", " (map ("Binary "++) typeLetters)) ++ " => "
+            wrap (join ", " (map ("Restore "++) typeLetters)) ++ " => "
         | otherwise = ""
     inst = wrap $ tyConName typeName ++ concatMap (" "++) typeLetters
     wrap x = if nTypeChildren > 0 then "("++x++")" else x 

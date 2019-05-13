@@ -3,7 +3,7 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      : Data.Binary.Builder
+-- Module      : Data.Restore.Builder
 -- Copyright   : Lennart Kolmodin, Ross Paterson
 -- License     : BSD3-style (see LICENSE)
 --
@@ -17,7 +17,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Data.Binary.Builder (
+module Data.Restore.Builder (
     -- * The Builder type
       Builder
     , toLazyByteString

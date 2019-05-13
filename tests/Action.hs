@@ -13,7 +13,7 @@ import           Test.Framework.Providers.QuickCheck2
 import           Test.QuickCheck
 
 import           Arbitrary                            ()
-import qualified Data.Binary.Get                      as Binary
+import qualified Data.Restore.Get                      as Restore
 
 tests :: [Test]
 tests = [ testProperty "action" prop_action
@@ -121,7 +121,7 @@ randomInput n = do
   rest <- randomInput (n-m)
   return (L.append (L.fromChunks [b]) rest)
 
--- | Build binary programs and compare running them to running a (hopefully)
+-- | Build restore programs and compare running them to running a (hopefully)
 -- identical model.
 -- Tests that 'bytesRead' returns correct values when used together with '<|>'
 -- and 'fail'.
@@ -131,7 +131,7 @@ prop_action =
     let max_len_input = max_len actions in
     forAll (randomInput max_len_input) $ \ lbs ->
       let allInput = B.concat (L.toChunks lbs) in
-      case Binary.runGetOrFail (execute allInput actions) lbs of
+      case Restore.runGetOrFail (execute allInput actions) lbs of
         Right (_inp, _off, _x) -> True
         Left (_inp, _off, _msg) -> True
 
@@ -144,7 +144,7 @@ prop_label =
     forAll (randomInput max_len_input) $ \ lbs ->
       let allInput = B.concat (L.toChunks lbs) in
       collect (failReason $ eval max_len_input actions) $
-      case Binary.runGetOrFail (execute allInput actions) lbs of
+      case Restore.runGetOrFail (execute allInput actions) lbs of
         Left (_inp, _off, msg) ->
           let lbls = case collectLabels max_len_input actions of
                          Just lbls' -> lbls'
@@ -162,7 +162,7 @@ prop_fail =
     forAll (randomInput max_len_input) $ \ lbs ->
       let allInput = B.concat (L.toChunks lbs) in
       collect (failReason $ eval max_len_input actions) $
-      case Binary.runGetOrFail (execute allInput actions) lbs of
+      case Restore.runGetOrFail (execute allInput actions) lbs of
         Left (inp, off, _msg) ->
           case () of
             _ | Just off /= findFailPosition max_len_input actions ->
@@ -185,7 +185,7 @@ collectLabels inp xxs =
 
 -- | Finds at which byte offset the decoder will fail,
 -- or Nothing if it won't fail.
-findFailPosition :: Int -> [Action] -> Maybe Binary.ByteOffset
+findFailPosition :: Int -> [Action] -> Maybe Restore.ByteOffset
 findFailPosition inp xxs =
   case eval inp xxs of
     EFail _ _ inp' -> return (fromIntegral (inp-inp'))
@@ -273,7 +273,7 @@ eval inp0 = go inp0 []
 -- this decoder. It is used in this function to compare the expected
 -- value with the actual value from the decoder functions.
 -- The second argument is the model - the actions we will execute.
-execute :: B.ByteString -> [Action] -> Binary.Get ()
+execute :: B.ByteString -> [Action] -> Restore.Get ()
 execute inp acts0 = go 0 acts0 >> return ()
   where
   inp_len = B.length inp
@@ -283,7 +283,7 @@ execute inp acts0 = go 0 acts0 >> return ()
       Actions a -> go pos (a++xs)
       GetByteString n -> do
         -- Run the operation in the Get monad...
-        actual <- Binary.getByteString n
+        actual <- Restore.getByteString n
         let expected = B.take n . B.drop pos $ inp
         -- ... and compare that we got what we expected.
         when (actual /= expected) $ error $
@@ -292,7 +292,7 @@ execute inp acts0 = go 0 acts0 >> return ()
         go (pos+n) xs
       GetByteStringL n -> do
         -- Run the operation in the Get monad...
-        actual <- L.toStrict <$> Binary.getLazyByteString (fromIntegral n)
+        actual <- L.toStrict <$> Restore.getLazyByteString (fromIntegral n)
         let expected = B.take n . B.drop pos $ inp
         -- ... and compare that we got what we expected.
         when (actual /= expected) $ error $
@@ -300,10 +300,10 @@ execute inp acts0 = go 0 acts0 >> return ()
           ", got: " ++ show actual ++ ", expected: " ++ show expected
         go (pos+n) xs
       Skip n -> do
-        Binary.skip n
+        Restore.skip n
         go (pos+n) xs
       BytesRead -> do
-        pos' <- Binary.bytesRead
+        pos' <- Restore.bytesRead
         if pos == fromIntegral pos'
           then go pos xs
           else error $ "execute(bytesRead): expected " ++
@@ -311,27 +311,27 @@ execute inp acts0 = go 0 acts0 >> return ()
       Fail -> fail "fail"
       Isolate n as -> do
         let str = B.take n (B.drop pos inp)
-        _ <- Binary.isolate n (execute str as)
+        _ <- Restore.isolate n (execute str as)
         when (willFail (inp_len - pos) [Isolate n as]) $
           error "expected isolate to fail"
         go (pos + n) xs
       Label str as -> do
-        len <- Binary.label str (leg pos as)
+        len <- Restore.label str (leg pos as)
         go (pos+len) xs
       LookAhead a -> do
-        _ <- Binary.lookAhead (go pos a)
+        _ <- Restore.lookAhead (go pos a)
         go pos xs
       LookAheadM b a -> do
         let f True = Just <$> leg pos a
             f False = go pos a >> return Nothing
-        len <- Binary.lookAheadM (f b)
+        len <- Restore.lookAheadM (f b)
         case len of
           Nothing -> go pos xs
           Just offset -> go (pos+offset) xs
       LookAheadE b a -> do
         let f True = Right <$> leg pos a
             f False = go pos a >> return (Left ())
-        len <- Binary.lookAheadE (f b)
+        len <- Restore.lookAheadE (f b)
         case len of
           Left _ -> go pos xs
           Right offset -> go (pos+offset) xs

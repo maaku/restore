@@ -9,7 +9,7 @@
 --
 --   Implements casting via a 1-element STUArray, as described in
 --   <http://stackoverflow.com/a/7002812/263061>.
-module Data.Binary.FloatCast
+module Data.Restore.FloatCast
   ( floatToWord  -- | Reinterpret-casts a `Float` to a `Word32`.
   , wordToFloat  -- | Reinterpret-casts a `Word32` to a `Float`.
   , doubleToWord -- | Reinterpret-casts a `Double` to a `Word64`.

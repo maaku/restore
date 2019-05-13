@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
 
-module Data.Binary.Internal 
+module Data.Restore.Internal 
  ( accursedUnutterablePerformIO ) where
 
 #if MIN_VERSION_bytestring(0,10,6)

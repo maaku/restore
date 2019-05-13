@@ -17,8 +17,8 @@ import Data.Char (ord)
 import Data.List (foldl')
 
 import Control.Applicative
-import Data.Binary
-import Data.Binary.Get
+import Data.Restore
+import Data.Restore.Get
 
 import qualified Data.Serialize.Get as Cereal
 
@@ -44,9 +44,9 @@ main = do
      ]
   defaultMain
     [ bgroup "brackets"
-        [ bench "Binary 100kb, one chunk" $
+        [ bench "Restore 100kb, one chunk" $
             whnf (checkBracket . runTest bracketParser) brackets
-        , bench "Binary 100kb, 100 byte chunks" $
+        , bench "Restore 100kb, 100 byte chunks" $
             whnf (checkBracket . runTest bracketParser) bracketsInChunks
         , bench "Attoparsec lazy-bs 100kb, one chunk" $
             whnf (checkBracket . runAttoL bracketParser_atto) brackets
@@ -60,7 +60,7 @@ main = do
     , bgroup "comparison getStruct4, 1MB of struct of 4 Word8s"
       [ bench "Attoparsec" $
           whnf (runAtto (getStruct4_atto mega)) oneMegabyte
-      , bench "Binary" $
+      , bench "Restore" $
           whnf (runTest (getStruct4 mega)) oneMegabyteLBS
       , bench "Cereal" $
           whnf (runCereal (getStruct4_cereal mega)) oneMegabyte
@@ -68,7 +68,7 @@ main = do
     , bgroup "comparison getWord8, 1MB"
         [ bench "Attoparsec" $
             whnf (runAtto (getWord8N1_atto mega)) oneMegabyte
-        , bench "Binary" $
+        , bench "Restore" $
             whnf (runTest (getWord8N1 mega)) oneMegabyteLBS
         , bench "Cereal" $
             whnf (runCereal (getWord8N1_cereal mega)) oneMegabyte

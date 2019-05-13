@@ -24,7 +24,7 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      : Data.Binary.Class
+-- Module      : Data.Restore.Class
 -- Copyright   : Lennart Kolmodin
 -- License     : BSD3-style (see LICENSE)
 --
@@ -36,14 +36,14 @@
 --
 -----------------------------------------------------------------------------
 
-module Data.Binary.Class (
+module Data.Restore.Class (
 
-    -- * The Binary class
-      Binary(..)
+    -- * The Restore class
+      Restore(..)
 
     -- * Support for generics
-    , GBinaryGet(..)
-    , GBinaryPut(..)
+    , GRestoreGet(..)
+    , GRestorePut(..)
 
     ) where
 
@@ -55,8 +55,8 @@ import Data.Complex (Complex(..))
 import Data.Void
 #endif
 
-import Data.Binary.Put
-import Data.Binary.Get
+import Data.Restore.Put
+import Data.Restore.Get
 
 #if ! MIN_VERSION_base(4,8,0)
 import Control.Applicative
@@ -123,33 +123,33 @@ import Data.Version (Version(..))
 ------------------------------------------------------------------------
 
 -- Factored into two classes because this makes GHC optimize the
--- instances faster.  This doesn't matter for builds of binary,
--- but it matters a lot for end-users who write 'instance Binary T'.
+-- instances faster.  This doesn't matter for builds of restore,
+-- but it matters a lot for end-users who write 'instance Restore T'.
 -- See also: https://ghc.haskell.org/trac/ghc/ticket/9630
-class GBinaryPut f where
+class GRestorePut f where
     gput :: f t -> Put
 
-class GBinaryGet f where
+class GRestoreGet f where
     gget :: Get (f t)
 
--- | The 'Binary' class provides 'put' and 'get', methods to encode and
+-- | The 'Restore' class provides 'put' and 'get', methods to encode and
 -- decode a Haskell value to a lazy 'ByteString'. It mirrors the 'Read' and
 -- 'Show' classes for textual representation of Haskell types, and is
 -- suitable for serialising Haskell values to disk, over the network.
 --
 -- For decoding and generating simple external binary formats (e.g. C
--- structures), Binary may be used, but in general is not suitable
+-- structures), Restore may be used, but in general is not suitable
 -- for complex protocols. Instead use the 'Put' and 'Get' primitives
 -- directly.
 --
--- Instances of Binary should satisfy the following property:
+-- Instances of Restore should satisfy the following property:
 --
 -- > decode . encode == id
 --
 -- That is, the 'get' and 'put' methods should be the inverse of each
 -- other. A range of instances are provided for basic Haskell types.
 --
-class Binary t where
+class Restore t where
     -- | Encode a value in the Put monad.
     put :: t -> Put
     -- | Decode a value in the Get monad
@@ -161,14 +161,14 @@ class Binary t where
     putList :: [t] -> Put
     putList = defaultPutList
 
-    default put :: (Generic t, GBinaryPut (Rep t)) => t -> Put
+    default put :: (Generic t, GRestorePut (Rep t)) => t -> Put
     put = gput . from
 
-    default get :: (Generic t, GBinaryGet (Rep t)) => Get t
+    default get :: (Generic t, GRestoreGet (Rep t)) => Get t
     get = to `fmap` gget
 
 {-# INLINE defaultPutList #-}
-defaultPutList :: Binary a => [a] -> Put
+defaultPutList :: Restore a => [a] -> Put
 defaultPutList xs = put (length xs) <> mapM_ put xs
 
 ------------------------------------------------------------------------
@@ -179,19 +179,19 @@ defaultPutList xs = put (length xs) <> mapM_ put xs
 -- value of that type
 
 -- | @since 0.8.0.0
-instance Binary Void where
+instance Restore Void where
     put     = absurd
     get     = mzero
 #endif
 
 -- The () type need never be written to disk: values of singleton type
 -- can be reconstructed from the type alone
-instance Binary () where
+instance Restore () where
     put ()  = mempty
     get     = return ()
 
 -- Bools are encoded as a byte in the range 0 .. 1
-instance Binary Bool where
+instance Restore Bool where
     put     = putWord8 . fromIntegral . fromEnum
     get     = getWord8 >>= toBool
       where
@@ -200,7 +200,7 @@ instance Binary Bool where
         toBool c = fail ("Could not map value " ++ show c ++ " to Bool")
 
 -- Values of type 'Ordering' are encoded as a byte in the range 0 .. 2
-instance Binary Ordering where
+instance Restore Ordering where
     put     = putWord8 . fromIntegral . fromEnum
     get     = getWord8 >>= toOrd
       where
@@ -213,7 +213,7 @@ instance Binary Ordering where
 -- Words and Ints
 
 -- Words8s are written as bytes
-instance Binary Word8 where
+instance Restore Word8 where
     put     = putWord8
     {-# INLINE putList #-}
     putList xs =
@@ -222,7 +222,7 @@ instance Binary Word8 where
     get     = getWord8
 
 -- Words16s are written as 2 bytes in big-endian (network) order
-instance Binary Word16 where
+instance Restore Word16 where
     put     = putWord16be
     {-# INLINE putList #-}
     putList xs =
@@ -231,7 +231,7 @@ instance Binary Word16 where
     get     = getWord16be
 
 -- Words32s are written as 4 bytes in big-endian (network) order
-instance Binary Word32 where
+instance Restore Word32 where
     put     = putWord32be
     {-# INLINE putList #-}
     putList xs =
@@ -240,7 +240,7 @@ instance Binary Word32 where
     get     = getWord32be
 
 -- Words64s are written as 8 bytes in big-endian (network) order
-instance Binary Word64 where
+instance Restore Word64 where
     put     = putWord64be
     {-# INLINE putList #-}
     putList xs =
@@ -249,7 +249,7 @@ instance Binary Word64 where
     get     = getWord64be
 
 -- Int8s are written as a single byte.
-instance Binary Int8 where
+instance Restore Int8 where
     put     = putInt8
     {-# INLINE putList #-}
     putList xs =
@@ -258,7 +258,7 @@ instance Binary Int8 where
     get     = getInt8
 
 -- Int16s are written as a 2 bytes in big endian format
-instance Binary Int16 where
+instance Restore Int16 where
     put     = putInt16be
     {-# INLINE putList #-}
     putList xs =
@@ -267,7 +267,7 @@ instance Binary Int16 where
     get     = getInt16be
 
 -- Int32s are written as a 4 bytes in big endian format
-instance Binary Int32 where
+instance Restore Int32 where
     put     = putInt32be
     {-# INLINE putList #-}
     putList xs =
@@ -276,7 +276,7 @@ instance Binary Int32 where
     get     = getInt32be
 
 -- Int64s are written as a 8 bytes in big endian format
-instance Binary Int64 where
+instance Restore Int64 where
     put     = putInt64be
     {-# INLINE putList #-}
     putList xs =
@@ -287,7 +287,7 @@ instance Binary Int64 where
 ------------------------------------------------------------------------
 
 -- Words are are written as Word64s, that is, 8 bytes in big endian format
-instance Binary Word where
+instance Restore Word where
     put     = putWord64be . fromIntegral
     {-# INLINE putList #-}
     putList xs =
@@ -296,7 +296,7 @@ instance Binary Word where
     get     = liftM fromIntegral getWord64be
 
 -- Ints are are written as Int64s, that is, 8 bytes in big endian format
-instance Binary Int where
+instance Restore Int where
     put     = putInt64be . fromIntegral
     {-# INLINE putList #-}
     putList xs =
@@ -317,7 +317,7 @@ type SmallInt = Int32
 -- is too large to fit in a SmallInt, it is written as a byte array,
 -- along with a sign and length field.
 
-instance Binary Integer where
+instance Restore Integer where
 
     {-# INLINE put #-}
     put n | n >= lo && n <= hi =
@@ -345,11 +345,11 @@ instance Binary Integer where
 
 -- | @since 0.8.0.0
 #ifdef HAS_FIXED_CONSTRUCTOR
-instance Binary (Fixed.Fixed a) where
+instance Restore (Fixed.Fixed a) where
   put (Fixed.MkFixed a) = put a
   get = Fixed.MkFixed `liftM` get
 #else
-instance forall a. Fixed.HasResolution a => Binary (Fixed.Fixed a) where
+instance forall a. Fixed.HasResolution a => Restore (Fixed.Fixed a) where
   -- Using undefined :: Maybe a as a proxy, as Data.Proxy is introduced only in base-4.7
   put x = put (truncate (x * fromInteger (Fixed.resolution (undefined :: Maybe a))) :: Integer)
   get = (\x -> fromInteger x / fromInteger (Fixed.resolution (undefined :: Maybe a))) `liftM` get
@@ -374,7 +374,7 @@ roll   = foldl' unstep 0 . reverse
 type NaturalWord = Word64
 
 -- | @since 0.7.3.0
-instance Binary Natural where
+instance Restore Natural where
     {-# INLINE put #-}
     put n | n <= hi =
         putWord8 0
@@ -411,7 +411,7 @@ import GHC.Prim
 import GHC.Ptr (Ptr(..))
 import GHC.IOBase (IO(..))
 
-instance Binary Integer where
+instance Restore Integer where
     put (S# i)    = putWord8 0 >> put (I# i)
     put (J# s ba) = do
         putWord8 1
@@ -427,7 +427,7 @@ instance Binary Integer where
                     (BA a#) <- get
                     return (J# s# a#)
 
-instance Binary ByteArray where
+instance Restore ByteArray where
 
     -- Pretty safe.
     put (BA ba) =
@@ -461,11 +461,11 @@ freezeByteArray arr = IO $ \s ->
 
 -}
 
-instance (Binary a,Integral a) => Binary (R.Ratio a) where
+instance (Restore a,Integral a) => Restore (R.Ratio a) where
     put r = put (R.numerator r) <> put (R.denominator r)
     get = liftM2 (R.%) get get
 
-instance Binary a => Binary (Complex a) where
+instance Restore a => Restore (Complex a) where
     {-# INLINE put #-}
     put (r :+ i) = put (r, i)
     {-# INLINE get #-}
@@ -474,7 +474,7 @@ instance Binary a => Binary (Complex a) where
 ------------------------------------------------------------------------
 
 -- Char is serialised as UTF-8
-instance Binary Char where
+instance Restore Char where
     put = putCharUtf8
     putList str = put (length str) <> putStringUtf8 str
     get = do
@@ -506,25 +506,25 @@ instance Binary Char where
 ------------------------------------------------------------------------
 -- Instances for the first few tuples
 
-instance (Binary a, Binary b) => Binary (a,b) where
+instance (Restore a, Restore b) => Restore (a,b) where
     {-# INLINE put #-}
     put (a,b)           = put a <> put b
     {-# INLINE get #-}
     get                 = liftM2 (,) get get
 
-instance (Binary a, Binary b, Binary c) => Binary (a,b,c) where
+instance (Restore a, Restore b, Restore c) => Restore (a,b,c) where
     {-# INLINE put #-}
     put (a,b,c)         = put a <> put b <> put c
     {-# INLINE get #-}
     get                 = liftM3 (,,) get get get
 
-instance (Binary a, Binary b, Binary c, Binary d) => Binary (a,b,c,d) where
+instance (Restore a, Restore b, Restore c, Restore d) => Restore (a,b,c,d) where
     {-# INLINE put #-}
     put (a,b,c,d)       = put a <> put b <> put c <> put d
     {-# INLINE get #-}
     get                 = liftM4 (,,,) get get get get
 
-instance (Binary a, Binary b, Binary c, Binary d, Binary e) => Binary (a,b,c,d,e) where
+instance (Restore a, Restore b, Restore c, Restore d, Restore e) => Restore (a,b,c,d,e) where
     {-# INLINE put #-}
     put (a,b,c,d,e)     = put a <> put b <> put c <> put d <> put e
     {-# INLINE get #-}
@@ -534,39 +534,39 @@ instance (Binary a, Binary b, Binary c, Binary d, Binary e) => Binary (a,b,c,d,e
 -- and now just recurse:
 --
 
-instance (Binary a, Binary b, Binary c, Binary d, Binary e, Binary f)
-        => Binary (a,b,c,d,e,f) where
+instance (Restore a, Restore b, Restore c, Restore d, Restore e, Restore f)
+        => Restore (a,b,c,d,e,f) where
     {-# INLINE put #-}
     put (a,b,c,d,e,f)   = put (a,(b,c,d,e,f))
     {-# INLINE get #-}
     get                 = do (a,(b,c,d,e,f)) <- get ; return (a,b,c,d,e,f)
 
-instance (Binary a, Binary b, Binary c, Binary d, Binary e, Binary f, Binary g)
-        => Binary (a,b,c,d,e,f,g) where
+instance (Restore a, Restore b, Restore c, Restore d, Restore e, Restore f, Restore g)
+        => Restore (a,b,c,d,e,f,g) where
     {-# INLINE put #-}
     put (a,b,c,d,e,f,g) = put (a,(b,c,d,e,f,g))
     {-# INLINE get #-}
     get                 = do (a,(b,c,d,e,f,g)) <- get ; return (a,b,c,d,e,f,g)
 
-instance (Binary a, Binary b, Binary c, Binary d, Binary e,
-          Binary f, Binary g, Binary h)
-        => Binary (a,b,c,d,e,f,g,h) where
+instance (Restore a, Restore b, Restore c, Restore d, Restore e,
+          Restore f, Restore g, Restore h)
+        => Restore (a,b,c,d,e,f,g,h) where
     {-# INLINE put #-}
     put (a,b,c,d,e,f,g,h) = put (a,(b,c,d,e,f,g,h))
     {-# INLINE get #-}
     get                   = do (a,(b,c,d,e,f,g,h)) <- get ; return (a,b,c,d,e,f,g,h)
 
-instance (Binary a, Binary b, Binary c, Binary d, Binary e,
-          Binary f, Binary g, Binary h, Binary i)
-        => Binary (a,b,c,d,e,f,g,h,i) where
+instance (Restore a, Restore b, Restore c, Restore d, Restore e,
+          Restore f, Restore g, Restore h, Restore i)
+        => Restore (a,b,c,d,e,f,g,h,i) where
     {-# INLINE put #-}
     put (a,b,c,d,e,f,g,h,i) = put (a,(b,c,d,e,f,g,h,i))
     {-# INLINE get #-}
     get                     = do (a,(b,c,d,e,f,g,h,i)) <- get ; return (a,b,c,d,e,f,g,h,i)
 
-instance (Binary a, Binary b, Binary c, Binary d, Binary e,
-          Binary f, Binary g, Binary h, Binary i, Binary j)
-        => Binary (a,b,c,d,e,f,g,h,i,j) where
+instance (Restore a, Restore b, Restore c, Restore d, Restore e,
+          Restore f, Restore g, Restore h, Restore i, Restore j)
+        => Restore (a,b,c,d,e,f,g,h,i,j) where
     {-# INLINE put #-}
     put (a,b,c,d,e,f,g,h,i,j) = put (a,(b,c,d,e,f,g,h,i,j))
     {-# INLINE get #-}
@@ -576,18 +576,18 @@ instance (Binary a, Binary b, Binary c, Binary d, Binary e,
 -- Container types
 
 #if MIN_VERSION_base(4,8,0)
-instance Binary a => Binary (Identity a) where
+instance Restore a => Restore (Identity a) where
   put (Identity x) = put x
   get = Identity <$> get
 #endif
 
-instance Binary a => Binary [a] where
+instance Restore a => Restore [a] where
     put = putList
     get = do n <- get :: Get Int
              getMany n
 
 -- | @'getMany' n@ get @n@ elements in order, without blowing the stack.
-getMany :: Binary a => Int -> Get [a]
+getMany :: Restore a => Int -> Get [a]
 getMany n = go [] n
  where
     go xs 0 = return $! reverse xs
@@ -597,7 +597,7 @@ getMany n = go [] n
                  x `seq` go (x:xs) (i-1)
 {-# INLINE getMany #-}
 
-instance (Binary a) => Binary (Maybe a) where
+instance (Restore a) => Restore (Maybe a) where
     put Nothing  = putWord8 0
     put (Just x) = putWord8 1 <> put x
     get = do
@@ -606,7 +606,7 @@ instance (Binary a) => Binary (Maybe a) where
             0 -> return Nothing
             _ -> liftM Just get
 
-instance (Binary a, Binary b) => Binary (Either a b) where
+instance (Restore a, Restore b) => Restore (Either a b) where
     put (Left  a) = putWord8 0 <> put a
     put (Right b) = putWord8 1 <> put b
     get = do
@@ -618,7 +618,7 @@ instance (Binary a, Binary b) => Binary (Either a b) where
 ------------------------------------------------------------------------
 -- ByteStrings (have specially efficient instances)
 
-instance Binary B.ByteString where
+instance Restore B.ByteString where
     put bs = put (B.length bs)
              <> putByteString bs
     get    = get >>= getByteString
@@ -628,14 +628,14 @@ instance Binary B.ByteString where
 --
 -- Requires 'flexible instances'
 --
-instance Binary ByteString where
+instance Restore ByteString where
     put bs = put (fromIntegral (L.length bs) :: Int)
              <> putLazyByteString bs
     get    = get >>= getLazyByteString
 
 
 #if MIN_VERSION_bytestring(0,10,4)
-instance Binary BS.ShortByteString where
+instance Restore BS.ShortByteString where
    put bs = put (BS.length bs)
             <> putShortByteString bs
    get = get >>= fmap BS.toShort . getByteString
@@ -644,19 +644,19 @@ instance Binary BS.ShortByteString where
 ------------------------------------------------------------------------
 -- Maps and Sets
 
-instance (Binary a) => Binary (Set.Set a) where
+instance (Restore a) => Restore (Set.Set a) where
     put s = put (Set.size s) <> mapM_ put (Set.toAscList s)
     get   = liftM Set.fromDistinctAscList get
 
-instance (Binary k, Binary e) => Binary (Map.Map k e) where
+instance (Restore k, Restore e) => Restore (Map.Map k e) where
     put m = put (Map.size m) <> mapM_ put (Map.toAscList m)
     get   = liftM Map.fromDistinctAscList get
 
-instance Binary IntSet.IntSet where
+instance Restore IntSet.IntSet where
     put s = put (IntSet.size s) <> mapM_ put (IntSet.toAscList s)
     get   = liftM IntSet.fromDistinctAscList get
 
-instance (Binary e) => Binary (IntMap.IntMap e) where
+instance (Restore e) => Restore (IntMap.IntMap e) where
     put m = put (IntMap.size m) <> mapM_ put (IntMap.toAscList m)
     get   = liftM IntMap.fromDistinctAscList get
 
@@ -667,7 +667,7 @@ instance (Binary e) => Binary (IntMap.IntMap e) where
 -- This is valid Hugs, but you need the most recent Hugs
 --
 
-instance (Binary e) => Binary (Seq.Seq e) where
+instance (Restore e) => Restore (Seq.Seq e) where
     put s = put (Seq.length s) <> Fold.mapM_ put s
     get = do n <- get :: Get Int
              rep Seq.empty n get
@@ -679,14 +679,14 @@ instance (Binary e) => Binary (Seq.Seq e) where
 ------------------------------------------------------------------------
 -- Floating point
 
-instance Binary Double where
+instance Restore Double where
     put d = put (decodeFloat d)
     get   = do
         x <- get
         y <- get
         return $! encodeFloat x y
 
-instance Binary Float where
+instance Restore Float where
     put f = put (decodeFloat f)
     get   =  do
         x <- get
@@ -696,14 +696,14 @@ instance Binary Float where
 ------------------------------------------------------------------------
 -- Trees
 
-instance (Binary e) => Binary (T.Tree e) where
+instance (Restore e) => Restore (T.Tree e) where
     put (T.Node r s) = put r <> put s
     get = liftM2 T.Node get get
 
 ------------------------------------------------------------------------
 -- Arrays
 
-instance (Binary i, Ix i, Binary e) => Binary (Array i e) where
+instance (Restore i, Ix i, Restore e) => Restore (Array i e) where
     put a =
         put (bounds a)
         <> put (rangeSize $ bounds a) -- write the length
@@ -717,7 +717,7 @@ instance (Binary i, Ix i, Binary e) => Binary (Array i e) where
 --
 -- The IArray UArray e constraint is non portable. Requires flexible instances
 --
-instance (Binary i, Ix i, Binary e, IArray UArray e) => Binary (UArray i e) where
+instance (Restore i, Ix i, Restore e, IArray UArray e) => Restore (UArray i e) where
     put a =
         put (bounds a)
         <> put (rangeSize $ bounds a) -- now write the length
@@ -732,7 +732,7 @@ instance (Binary i, Ix i, Binary e, IArray UArray e) => Binary (UArray i e) wher
 -- Fingerprints
 
 -- | @since 0.7.6.0
-instance Binary Fingerprint where
+instance Restore Fingerprint where
     put (Fingerprint x1 x2) = put x1 <> put x2
     get = do
         x1 <- get
@@ -743,7 +743,7 @@ instance Binary Fingerprint where
 -- Version
 
 -- | @since 0.8.0.0
-instance Binary Version where
+instance Restore Version where
     put (Version br tags) = put br <> put tags
     get = Version <$> get <*> get
 
@@ -751,43 +751,43 @@ instance Binary Version where
 -- Data.Monoid datatypes
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (Monoid.Dual a) where
+instance Restore a => Restore (Monoid.Dual a) where
   get = fmap Monoid.Dual get
   put = put . Monoid.getDual
 
 -- | @since 0.8.4.0
-instance Binary Monoid.All where
+instance Restore Monoid.All where
   get = fmap Monoid.All get
   put = put . Monoid.getAll
 
 -- | @since 0.8.4.0
-instance Binary Monoid.Any where
+instance Restore Monoid.Any where
   get = fmap Monoid.Any get
   put = put . Monoid.getAny
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (Monoid.Sum a) where
+instance Restore a => Restore (Monoid.Sum a) where
   get = fmap Monoid.Sum get
   put = put . Monoid.getSum
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (Monoid.Product a) where
+instance Restore a => Restore (Monoid.Product a) where
   get = fmap Monoid.Product get
   put = put . Monoid.getProduct
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (Monoid.First a) where
+instance Restore a => Restore (Monoid.First a) where
   get = fmap Monoid.First get
   put = put . Monoid.getFirst
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (Monoid.Last a) where
+instance Restore a => Restore (Monoid.Last a) where
   get = fmap Monoid.Last get
   put = put . Monoid.getLast
 
 #if MIN_VERSION_base(4,8,0)
 -- | @since 0.8.4.0
-instance Binary (f a) => Binary (Monoid.Alt f a) where
+instance Restore (f a) => Restore (Monoid.Alt f a) where
   get = fmap Monoid.Alt get
   put = put . Monoid.getAlt
 #endif
@@ -797,37 +797,37 @@ instance Binary (f a) => Binary (Monoid.Alt f a) where
 -- Data.Semigroup datatypes
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (Semigroup.Min a) where
+instance Restore a => Restore (Semigroup.Min a) where
   get = fmap Semigroup.Min get
   put = put . Semigroup.getMin
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (Semigroup.Max a) where
+instance Restore a => Restore (Semigroup.Max a) where
   get = fmap Semigroup.Max get
   put = put . Semigroup.getMax
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (Semigroup.First a) where
+instance Restore a => Restore (Semigroup.First a) where
   get = fmap Semigroup.First get
   put = put . Semigroup.getFirst
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (Semigroup.Last a) where
+instance Restore a => Restore (Semigroup.Last a) where
   get = fmap Semigroup.Last get
   put = put . Semigroup.getLast
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (Semigroup.Option a) where
+instance Restore a => Restore (Semigroup.Option a) where
   get = fmap Semigroup.Option get
   put = put . Semigroup.getOption
 
 -- | @since 0.8.4.0
-instance Binary m => Binary (Semigroup.WrappedMonoid m) where
+instance Restore m => Restore (Semigroup.WrappedMonoid m) where
   get = fmap Semigroup.WrapMonoid get
   put = put . Semigroup.unwrapMonoid
 
 -- | @since 0.8.4.0
-instance (Binary a, Binary b) => Binary (Semigroup.Arg a b) where
+instance (Restore a, Restore b) => Restore (Semigroup.Arg a b) where
   get                     = liftM2 Semigroup.Arg get get
   put (Semigroup.Arg a b) = put a <> put b
 
@@ -835,7 +835,7 @@ instance (Binary a, Binary b) => Binary (Semigroup.Arg a b) where
 -- Non-empty lists
 
 -- | @since 0.8.4.0
-instance Binary a => Binary (NE.NonEmpty a) where
+instance Restore a => Restore (NE.NonEmpty a) where
   get = do
       list <- get
       case list of
@@ -851,10 +851,10 @@ instance Binary a => Binary (NE.NonEmpty a) where
 
 -- $typeable-instances
 --
--- 'Binary' instances for GHC's "Type.Reflection", "Data.Typeable", and
+-- 'Restore' instances for GHC's "Type.Reflection", "Data.Typeable", and
 -- kind-system primitives are only provided with @base-4.10.0@ (shipped with GHC
 -- 8.2.1). In prior GHC releases some of these instances were provided by
--- 'GHCi.TH.Binary' in the @ghci@ package.
+-- 'GHCi.TH.Restore' in the @ghci@ package.
 --
 -- These include instances for,
 --
@@ -869,17 +869,17 @@ instance Binary a => Binary (NE.NonEmpty a) where
 --
 
 -- | @since 0.8.5.0
-instance Binary VecCount where
+instance Restore VecCount where
     put = putWord8 . fromIntegral . fromEnum
     get = toEnum . fromIntegral <$> getWord8
 
 -- | @since 0.8.5.0
-instance Binary VecElem where
+instance Restore VecElem where
     put = putWord8 . fromIntegral . fromEnum
     get = toEnum . fromIntegral <$> getWord8
 
 -- | @since 0.8.5.0
-instance Binary RuntimeRep where
+instance Restore RuntimeRep where
     put (VecRep a b)    = putWord8 0 >> put a >> put b
     put (TupleRep reps) = putWord8 1 >> put reps
     put (SumRep reps)   = putWord8 2 >> put reps
@@ -920,10 +920,10 @@ instance Binary RuntimeRep where
           14 -> pure Int16Rep
           15 -> pure Word16Rep
 #endif
-          _  -> fail "GHCi.TH.Binary.putRuntimeRep: invalid tag"
+          _  -> fail "GHCi.TH.Restore.putRuntimeRep: invalid tag"
 
 -- | @since 0.8.5.0
-instance Binary TyCon where
+instance Restore TyCon where
     put tc = do
         put (tyConPackage tc)
         put (tyConModule tc)
@@ -933,7 +933,7 @@ instance Binary TyCon where
     get = mkTyCon <$> get <*> get <*> get <*> get <*> get
 
 -- | @since 0.8.5.0
-instance Binary KindRep where
+instance Restore KindRep where
     put (KindRepTyConApp tc k) = putWord8 0 >> put tc >> put k
     put (KindRepVar bndr) = putWord8 1 >> put bndr
     put (KindRepApp a b) = putWord8 2 >> put a >> put b
@@ -950,10 +950,10 @@ instance Binary KindRep where
           3 -> KindRepFun <$> get <*> get
           4 -> KindRepTYPE <$> get
           5 -> KindRepTypeLit <$> get <*> get
-          _ -> fail "GHCi.TH.Binary.putKindRep: invalid tag"
+          _ -> fail "GHCi.TH.Restore.putKindRep: invalid tag"
 
 -- | @since 0.8.5.0
-instance Binary TypeLitSort where
+instance Restore TypeLitSort where
     put TypeLitSymbol = putWord8 0
     put TypeLitNat = putWord8 1
     get = do
@@ -961,7 +961,7 @@ instance Binary TypeLitSort where
         case tag of
           0 -> pure TypeLitSymbol
           1 -> pure TypeLitNat
-          _ -> fail "GHCi.TH.Binary.putTypeLitSort: invalid tag"
+          _ -> fail "GHCi.TH.Restore.putTypeLitSort: invalid tag"
 
 putTypeRep :: TypeRep a -> Put
 -- Special handling for TYPE, (->), and RuntimeRep due to recursive kind
@@ -982,7 +982,7 @@ putTypeRep (Fun arg res) = do
     put (3 :: Word8)
     putTypeRep arg
     putTypeRep res
-putTypeRep _ = error "GHCi.TH.Binary.putTypeRep: Impossible"
+putTypeRep _ = error "GHCi.TH.Restore.putTypeRep: Impossible"
 
 getSomeTypeRep :: Get SomeTypeRep
 getSomeTypeRep = do
@@ -1025,23 +1025,23 @@ getSomeTypeRep = do
     tYPErep = typeRep
 
     failure description info =
-        fail $ unlines $ [ "GHCi.TH.Binary.getSomeTypeRep: "++description ]
+        fail $ unlines $ [ "GHCi.TH.Restore.getSomeTypeRep: "++description ]
                       ++ map ("    "++) info
 
-instance Typeable a => Binary (TypeRep (a :: k)) where
+instance Typeable a => Restore (TypeRep (a :: k)) where
     put = putTypeRep
     get = do
         SomeTypeRep rep <- getSomeTypeRep
         case rep `eqTypeRep` expected of
           Just HRefl -> pure rep
           Nothing    -> fail $ unlines
-                        [ "GHCi.TH.Binary: Type mismatch"
+                        [ "GHCi.TH.Restore: Type mismatch"
                         , "    Deserialized type: " ++ show rep
                         , "    Expected type:     " ++ show expected
                         ]
      where expected = typeRep :: TypeRep a
 
-instance Binary SomeTypeRep where
+instance Restore SomeTypeRep where
     put (SomeTypeRep rep) = putTypeRep rep
     get = getSomeTypeRep
 #endif

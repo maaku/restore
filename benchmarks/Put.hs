@@ -13,8 +13,8 @@ import Data.Monoid
 
 import GHC.Generics
 
-import Data.Binary
-import Data.Binary.Put
+import Data.Restore
+import Data.Restore.Put
 import Data.ByteString.Builder as BB
 import Prelude -- Silence Monoid import warning.
 
@@ -71,10 +71,10 @@ main = do
     run = L.length . runPut
 
 data Struct = Struct Word8 Word16 Word32 Word64 deriving Generic
-instance Binary Struct
+instance Restore Struct
 
 data StructList = StructList [Struct] deriving Generic
-instance Binary StructList
+instance Restore StructList
 
 structs :: [Struct]
 structs = take 10000 $ [ Struct a b 0 0 | a <- [0 .. maxBound], b <- [0 .. maxBound] ]

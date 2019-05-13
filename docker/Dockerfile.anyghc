@@ -1,4 +1,4 @@
-# Dockerfile to load a haskell environment for running binary's test suite.
+# Dockerfile to load a haskell environment for running restore's test suite.
 #
 # Building the Dockerfile creates an image which has the haskell environment
 # with ghc and cabal setup and ready to use.
@@ -14,31 +14,31 @@
 #
 #   docker build \
 #     -f docker/Dockerfile.ghc843 \
-#     -t haskell/binary \
+#     -t haskell/restore \
 #     --build-arg ghcver=8.4.2 \
 #     .
 #
 # How to run (caching the cabal store directory), default is 'cabal new-test':
 #
-#   docker run -it haskell/binary -v cabal-store-cache:/root/.cabal/store
+#   docker run -it haskell/restore -v cabal-store-cache:/root/.cabal/store
 #
 # Run 'cabal new-bench' or any other command (bash, to get into the machine):
 #
-#   docker run -it haskell/binary -v cabal-store-cache:/root/.cabal/store \
+#   docker run -it haskell/restore -v cabal-store-cache:/root/.cabal/store \
 #     cabal new-bench
 #
-# Hacks to build binary:
+# Hacks to build restore:
 #
 #   1) Copy all files from the host machine.
 #
-#   2) Rename binary to binary-next. This is an unfortunate consequence of
-#      binary being used by its test and benchmark dependencies.
-#      Not renaming binary will make cabal confused and it'll fail to build.
+#   2) Rename restore to restore-next. This is an unfortunate consequence of
+#      restore being used by its test and benchmark dependencies.
+#      Not renaming restore will make cabal confused and it'll fail to build.
 #
 #      Cabal can be made to build properly by carefully installing the test
 #      and benchmark dependencies manually, like it's done in .travis.yml.
 #      Unfortunately that setup is very fragile since changing the
-#      dependencies in binary.cabal also requires updating .travis.yml.
+#      dependencies in restore.cabal also requires updating .travis.yml.
 #      Thus .travis.yml gets out of sync when we forget.
 #      This method also doesn't work with the nix-style commands which
 #      themselves take care of installing dependencies.
@@ -87,16 +87,16 @@ RUN cabal new-update
 COPY . /workdir/copy
 
 WORKDIR /workdir/copy
-RUN sed -i.bak -e 's/name:\s*binary/name: binary-next/' binary.cabal
-RUN mv binary.cabal binary-next.cabal
+RUN sed -i.bak -e 's/name:\s*restore/name: restore-next/' restore.cabal
+RUN mv restore.cabal restore-next.cabal
 RUN cabal new-sdist
 
 WORKDIR /workdir/builddir
 RUN tar xf /workdir/copy/dist-newstyle/sdist/*.tar.gz -C /workdir/builddir
-RUN mv /workdir/builddir/binary-* /workdir/builddir/binary-next
-# generics-bench.cache.gz is not part of the binary distribution,
+RUN mv /workdir/builddir/restore-* /workdir/builddir/restore-next
+# generics-bench.cache.gz is not part of the restore distribution,
 # it's too large. It only lives in the git repo. Copy it manually.
-RUN mv /workdir/copy/generics-bench.cache.gz /workdir/builddir/binary-next
-WORKDIR /workdir/builddir/binary-next
+RUN mv /workdir/copy/generics-bench.cache.gz /workdir/builddir/restore-next
+WORKDIR /workdir/builddir/restore-next
 
 CMD cabal new-test
