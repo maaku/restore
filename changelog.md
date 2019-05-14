@@ -1,3 +1,21 @@
+restore
+=======
+
+restore-0.0.0.0
+---------------
+
+- Based on the unreleased branch of binary-0.8.7.0, with the patches for a few
+  in-progress PR's development efforts applied:
+    - Bump GHC versions used by Travis. (binary #165)
+    - add runGetIncremental', a much-faster strict version of the existing
+      runGetIncremental API (binary #125)
+    - Deserialize all TypeRep arrow representations.  Previously `TypeRep (a -> b)`
+      could only be deserialized if `a` and `b` both had kind `*`.  Change that to
+      allow any kinds of the form `TYPE rep`.  (binary #141)
+    - Factor out 'pushFromHandle' from 'withBinaryFile' (binary #154).
+    - Use base's built-in float/word32 and double/word64 casts instead, now that GHC
+      provides a way to do reinterpret-cast without overhead (binary #163, fixes #137).
+
 binary
 ======
 
