@@ -13,7 +13,7 @@
 --
 -- Maintainer  : Lennart Kolmodin <kolmodin@gmail.com>
 -- Stability   : experimental
--- Portability : portable to Hugs and GHC.
+-- Portability : Known to work on GHC.
 --
 -- The 'Get' monad. A monad for efficiently building structures from
 -- encoded lazy ByteStrings.

@@ -14,7 +14,7 @@
 --
 -- Maintainer  : Lennart Kolmodin <kolmodin@gmail.com>
 -- Stability   : stable
--- Portability : Portable to Hugs and GHC. Requires MPTCs
+-- Portability : Known to work on GHC. Requires MPTCs
 --
 -- The Put monad. A monad for efficiently constructing lazy bytestrings.
 --

@@ -30,7 +30,7 @@
 --
 -- Maintainer  : Lennart Kolmodin <kolmodin@gmail.com>
 -- Stability   : unstable
--- Portability : portable to Hugs and GHC. Requires the FFI and some flexible instances
+-- Portability : Known to work on GHC. Requires the FFI and some flexible instances.
 --
 -- Typeclass and instances for binary serialization.
 --

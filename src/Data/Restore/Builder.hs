@@ -9,7 +9,7 @@
 --
 -- Maintainer  : Lennart Kolmodin <kolmodin@gmail.com>
 -- Stability   : experimental
--- Portability : portable to Hugs and GHC
+-- Portability : Known to work on GHC.
 --
 -- Efficient constructions of lazy bytestrings.
 --

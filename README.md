@@ -12,7 +12,6 @@ The ``restore`` package provides Data.Restore, containing the Restore class,
 and associated methods, for serialising values to and from lazy
 ByteStrings.
 A key feature of ``restore`` is that the interface is both pure, and efficient.
-The ``restore`` package is portable to GHC and Hugs.
 
 ## Installing restore from Hackage ##
 

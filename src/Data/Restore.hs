@@ -8,7 +8,7 @@
 --
 -- Maintainer  : Lennart Kolmodin <kolmodin@gmail.com>
 -- Stability   : unstable
--- Portability : portable to Hugs and GHC. Requires the FFI and some flexible instances.
+-- Portability : Known to work on GHC. Requires the FFI and some flexible instances.
 --
 -- Binary serialisation of Haskell values to and from lazy 'ByteString's.
 -- The Restore library provides methods for encoding Haskell values as
