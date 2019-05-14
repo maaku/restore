@@ -1,6 +1,10 @@
 # restore package #
 
-[![Hackage version](https://img.shields.io/hackage/v/restore.svg?label=Hackage)](https://hackage.haskell.org/package/restore) [![Stackage version](https://www.stackage.org/package/restore/badge/lts?label=Stackage)](https://www.stackage.org/package/restore) [![Build Status](https://api.travis-ci.org/maaku/restore.png?branch=master)](http://travis-ci.org/maaku/restore)
+[![Hackage version](https://img.shields.io/hackage/v/restore.svg?label=Hackage)](https://hackage.haskell.org/package/restore)
+[![BSD3 license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Stackage Lts](https://stackage.org/package/restore/badge/lts)](https://stackage.org/lts/package/restore)
+[![Stackage Nightly](https://stackage.org/package/restore/badge/nightly)](https://stackage.org/nightly/package/restore)
+[![Build Status](https://api.travis-ci.org/maaku/restore.png?branch=master)](http://travis-ci.org/maaku/restore)
 
 *Efficient, pure binary serialisation using lazy ByteStrings.*
 
