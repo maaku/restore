@@ -14,7 +14,7 @@ description:     Efficient, pure binary serialisation using lazy ByteStrings.
                  so this library should be suitable for high performance
                  scenarios.
 synopsis:        Binary serialisation for Haskell values using lazy ByteStrings
-category:        Data, Parsing
+category:        Data, Parsing, Serialisation
 stability:       provisional
 build-type:      Simple
 cabal-version:   >= 1.8
