@@ -13,7 +13,7 @@ import           Test.Framework.Providers.QuickCheck2
 import           Test.QuickCheck
 
 import           Arbitrary                            ()
-import qualified Data.Restore.Get                      as Restore
+import qualified Data.Restore.Get                     as Restore
 
 tests :: [Test]
 tests = [ testProperty "action" prop_action
