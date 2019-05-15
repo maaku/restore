@@ -34,13 +34,15 @@ Here's how to get the latest version of the repository, configure and build.
 
     $ git clone git@github.com:maaku/restore.git
     $ cd restore
-    $ cabal update
-    $ cabal configure --enable-tests --enable-benchmarks
-    $ cabal build
+    $ stack build
 
 Run the test suite.
 
-    $ cabal test
+    $ stack test
+
+To run the benchmark suite (optional):
+
+    $ stack bench
 
 ## Using restore ##
 
