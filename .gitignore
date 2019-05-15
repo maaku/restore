@@ -4,6 +4,7 @@
 *.prof
 *.tix
 *.swp
+.vscode/
 .hpc/
 /benchmarks/bench
 /benchmarks/builder
