@@ -6,22 +6,21 @@
 [![Stackage Nightly](https://stackage.org/package/restore/badge/nightly)](https://stackage.org/nightly/package/restore)
 [![Build Status](https://api.travis-ci.org/maaku/restore.png?branch=master)](http://travis-ci.org/maaku/restore)
 
-*Efficient, pure binary serialisation using lazy ByteStrings.*
+*Efficient, pure, no-exception binary serialisation using lazy ByteStrings.*
 
-The ``restore`` package provides Data.Restore, containing the Restore class,
-and associated methods, for serialising values to and from lazy
-ByteStrings.
+The ``restore`` package provides Data.Restore, containing the Restore class, and
+associated methods, for serialising values to and from lazy ByteStrings.
 A key feature of ``restore`` is that the interface is both pure, and efficient.
+
+``restore`` is a fork of the ``binary`` package which included as part of The
+Glasgow Haskell Compiler (GHC).
+``restore`` presents a similar API, but with a simplified implementation and (!)
+a different binary serialisation format.
 
 ## Installing restore from Hackage ##
 
-``restore`` is part of The Glasgow Haskell Compiler (GHC) and therefore if you
-have either GHC or [The Haskell Platform](http://www.haskell.org/platform/)
-installed, you already have ``restore``.
-
-More recent versions of ``restore`` than you might have installed may be
-available. You can use ``cabal-install`` to install a later version from
-[Hackage](http://hackage.haskell.org/package/restore).
+You can use ``cabal-install`` to install the most recent stable version
+available from [Hackage](http://hackage.haskell.org/package/restore).
 
     $ cabal update
     $ cabal install restore
@@ -57,7 +56,7 @@ lazy bytestrings using the ``Builder`` monoid. Or, alternatively, the
 Data.Restore.Get and Data.Restore.Put to serialize/deserialize using
 the ``Get`` and ``Put`` monads.
 
-More information in the haddock documentation.
+More information can be found in the haddock documentation.
 
 ## Deriving restore instances using GHC's Generic ##
 
