@@ -1,3 +1,9 @@
+-- Copyright (c) 2006-2019 The Binary Developers.
+-- Copyright (c) 2019 The Restore Developers.
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0.  If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 {-# LANGUAGE BangPatterns, CPP, FlexibleInstances, KindSignatures,
     ScopedTypeVariables, TypeOperators, TypeSynonymInstances #-}
 {-# LANGUAGE Safe #-}
@@ -10,10 +16,10 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      : Data.Restore.Generic
--- Copyright   : Bryan O'Sullivan
--- License     : BSD3-style (see LICENSE)
+-- Copyright   : Bryan O'Sullivan, Mark Friedenbach
+-- License     : Mozilla Public License, v. 2.0 (see: LICENSE)
 --
--- Maintainer  : Bryan O'Sullivan <bos@serpentine.com>
+-- Maintainer  : Mark Friedenbach <mark@friedenbach.org>
 -- Stability   : unstable
 -- Portability : Only works with GHC 7.2 and newer
 --

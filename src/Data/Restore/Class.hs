@@ -1,3 +1,9 @@
+-- Copyright (c) 2006-2019 The Binary Developers.
+-- Copyright (c) 2019 The Restore Developers.
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0.  If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 {-# LANGUAGE CPP, FlexibleContexts #-}
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE GADTs #-}
@@ -25,10 +31,10 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      : Data.Restore.Class
--- Copyright   : Lennart Kolmodin
--- License     : BSD3-style (see LICENSE)
+-- Copyright   : Lennart Kolmodin, Mark Friedenbach
+-- License     : Mozilla Public License, v. 2.0 (see: LICENSE)
 --
--- Maintainer  : Lennart Kolmodin <kolmodin@gmail.com>
+-- Maintainer  : Mark Friedenbach <mark@friedenbach.org>
 -- Stability   : unstable
 -- Portability : Known to work on GHC. Requires the FFI and some flexible instances.
 --

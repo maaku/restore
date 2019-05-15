@@ -1,9 +1,9 @@
 name:            restore
 version:         0.8.7.0
-license:         BSD3
-license-file:    LICENSE
-author:          Lennart Kolmodin <kolmodin@gmail.com>
-maintainer:      Lennart Kolmodin, Don Stewart <dons00@gmail.com>
+license:         MPL-2.0
+license-file:    mpl-2.0.txt
+author:          Lennart Kolmodin <kolmodin@gmail.com>, Mark Friedenbach <mark@friedenbach.org>
+maintainer:      Mark Friedenbach <mark@friedenbach.org>
 homepage:        https://github.com/maaku/restore
 description:     Efficient, pure binary serialisation using lazy ByteStrings.
                  Haskell values may be encoded to and from binary formats,

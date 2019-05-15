@@ -1,7 +1,7 @@
 # restore package #
 
 [![Hackage version](https://img.shields.io/hackage/v/restore.svg?label=Hackage)](https://hackage.haskell.org/package/restore)
-[![BSD3 license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![MPL-2.0 license](https://img.shields.io/badge/license-MPL%202.0-brightgreen.svg)](https://www.mozilla.org/en-US/MPL/2.0/FAQ/)
 [![Stackage Lts](https://stackage.org/package/restore/badge/lts)](https://stackage.org/lts/package/restore)
 [![Stackage Nightly](https://stackage.org/package/restore/badge/nightly)](https://stackage.org/nightly/package/restore)
 [![Build Status](https://api.travis-ci.org/maaku/restore.png?branch=master)](http://travis-ci.org/maaku/restore)
@@ -76,6 +76,12 @@ instance Restore Foo
 
 ## Contributors ##
 
+The following developers have contributed to ``restore``:
+
+* Mark Friedenbach
+
+The following developers contributed to the ``binary`` package from which ``restore`` was originally forked:
+
 * Lennart Kolmodin
 * Duncan Coutts
 * Don Stewart
@@ -92,5 +98,5 @@ instance Restore Foo
 * Bas van Dijk
 * Florian Weimer
 
-For a full list of contributors, see
+For a full list of contributors, inclusive of both projects, see
 [here](https://github.com/maaku/restore/graphs/contributors).

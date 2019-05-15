@@ -1,3 +1,9 @@
+-- Copyright (c) 2006-2019 The Binary Developers.
+-- Copyright (c) 2019 The Restore Developers.
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0.  If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE Safe #-}
@@ -9,10 +15,10 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      : Data.Restore.Put
--- Copyright   : Lennart Kolmodin
--- License     : BSD3-style (see LICENSE)
+-- Copyright   : Lennart Kolmodin, Mark Friedenbach
+-- License     : Mozilla Public License, v. 2.0 (see: LICENSE)
 --
--- Maintainer  : Lennart Kolmodin <kolmodin@gmail.com>
+-- Maintainer  : Mark Friedenbach <mark@friedenbach.org>
 -- Stability   : stable
 -- Portability : Known to work on GHC. Requires MPTCs
 --

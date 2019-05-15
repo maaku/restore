@@ -1,30 +1,73 @@
-Copyright (c) Lennart Kolmodin
+Restore is a fork of ``binary``, with the ``binary`` package's source code
+originally licensed to the Restore Developers under the terms of the BSD
+3-Clause License (see: bsd3-license.txt).
 
-All rights reserved.
+However all code subsequently added by the Restore Developers has copyright held
+by the Restore Developers and is provided solely only under the terms of the
+Mozilla Public License 2.0 (see: mpl-2.0.txt).
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
+As permitted by the BSD 3-Clause License, the `binary` portions are sublicensed
+for distribution under the terms of the Mozilla Public License 2.0, and so the
+combined work is distributed under the conjunctive terms of BOTH licenses, and
+BOTH licenses must be observed for any source or binary distribution, or future
+fork or derived work.
 
-1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
+A description of intent
+-----------------------
 
-2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
+It is a common mistake among software engineering professionals to treat
+licenses, and legal verbage generally as absolute conditions enforced by some
+unwaivering neutral legal enforcer: a sort of modern-day sorcerer's apprentice.
+Of course the reality is nothing like that: any real court case is determined by
+human judges or arbitrators with due consideration to, among other things, the
+inferred original intent of the parties involved.  This note is an attempt to
+document the intent of the Restore Developers who re-licensed the ``binary``
+package from the 3-Clause BSD to the Mozilla Public License 2.0 in the creation
+of the new ``restore`` package.
 
-3. Neither the name of the author nor the names of his contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
+The original authors of ``binary`` created and maintained their package, making
+it available under the terms of the 3-Clause BSD open-source license.  That work
+included contributions by other developers in the form of "patches" that were
+provided by those other developers to the original authors and maintainers also
+under the terms of the same 3-Clause BSD license.
 
-THIS SOFTWARE IS PROVIDED BY THE CONTRIBUTORS ``AS IS'' AND ANY EXPRESS
-OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
+At the time of fork, the Restore Developers utilized their rights available
+under the 3-Clause BSD to relicense the ``binary`` package under the terms of
+the Mozilla Public License (MPL) 2.0, whose conditions are generally considered
+to be a superset of the 3-Clause BSD.  To be clear: the MPL 2.0 incorporates
+conditions that are generally the same as those in the 3-Clause BSD, as well as
+introducing further copyleft restrictions.  The licenses are generally thought
+to be compatible in the sense that 3-Clause BSD licensed source code may be
+incorporated into an MPL 2.0 program, although the reverse direction is not
+possible.
+
+After forking and relicensing, the Restore Developers madeM further modifications
+to the codebase in the form of patches provided solely under the terms of the
+MPL 2.0.  The combined work which results from applying these patches--which
+happens e.g. every time the ``restore`` repository is checked out from version
+control--can therefore be largely treated as if it were just made available
+under the terms of the MPL, which is the more restrictive license.
+
+Still we, the Restore Developers and later contributors, must be careful to keep
+the original copyright and license declarations (which cannot be changed) and
+include in our releases, source or binary, the full text of both licenses as
+their terms require.
+
+Note: Many other projects which provide two licenses follow the so-called
+      "dual-license" structure where the recipient has the disjuntive (OR)
+      choice of which license to apply.  That is NOT what is happening here:
+      with ``restore`` the recipient is conjunctively (AND) required to obey the
+      terms of BOTH licenses.
+
+The intent is NOT to prevent upstream contributions from ``restore`` back into
+the original 3-Clause BSD licensed ``binary`` package, but rather to ensure that
+copyleft restrictions apply to any derived works.  The inability to cherry-pick
+patches back to upstream is merely an unfortunate consequence.  When it seems
+likely that a patch made to ``restore`` would be of potential value to both
+projects, the Restore Developers encourage contributors to make their patches
+available under a dual-license so that they can be proposed for upstream as
+well.  However when unspecified the default assumption regarding all
+contributions received by the Restore Developers is that they are solely
+licensed under the terms of the ``restore`` project, namely the MPL 2.0.  A
+dual-licensed patch must clarify that status in its commit message and/or the
+text of the change itself.
