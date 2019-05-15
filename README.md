@@ -28,7 +28,7 @@ available from [Hackage](http://hackage.haskell.org/package/restore).
 ## Building restore ##
 
 ``restore`` comes with both a test suite and a set of benchmarks.
-While developing, you probably want to enable both.
+While developing, you probably want to run both.
 Here's how to get the latest version of the repository, configure and build.
 
     $ git clone git@github.com:maaku/restore.git
